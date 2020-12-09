@@ -69,7 +69,7 @@ func CountValidPasswordsMinCharacters(passwords []Password) int {
   }
 
   if countValid <= 0 {
-    log.Fatal(chalk.Red, "no valid passwords found")
+    log.Panic(chalk.Red, "no valid passwords found")
   }
 
   fmt.Println(chalk.Green, countValid, "valid passwords found")
@@ -97,13 +97,13 @@ func CountValidPasswordsCharacterLocation(passwords []Password) int {
       }
       
     } else {
-      log.Fatal(chalk.Red, "index doesn't exist")
+      log.Panic(chalk.Red, "index doesn't exist")
     }
     
   }
 
   if countValid <= 0 {
-    log.Fatal(chalk.Red, "no valid passwords found")
+    log.Panic(chalk.Red, "no valid passwords found")
   }
 
   fmt.Println(chalk.Green, countValid, "valid passwords found")

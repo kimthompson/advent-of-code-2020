@@ -44,7 +44,7 @@ func FindSumToYearWithTwo(d []int) (int) {
     }
   }
 
-  log.Fatal("No matching sum found")
+  log.Panic("No matching sum found")
   return 0
 }
 
@@ -69,6 +69,6 @@ func FindSumToYearWithThree(d []int) (int) {
     }
   }
 
-  log.Fatal("No matching sum found")
+  log.Panic("No matching sum found")
   return 0
 }
