@@ -2,9 +2,12 @@ package main
 
 import (
   "fmt"
-  "io/ioutil"
+  "log"
   "strings"
   "strconv"
+  "io/ioutil"
+
+  "github.com/ttacon/chalk"
 )
 
 func main () {
@@ -18,7 +21,7 @@ func main () {
   fileContents := string(file)
   arrayOfLines := strings.Split(fileContents, "\n")
 
-  fmt.Println("formatting data . . .")
+  fmt.Println(chalk.White, "formatting data . . .")
 
   var cleaned []Password
 
@@ -30,7 +33,7 @@ func main () {
       max, err := strconv.Atoi(bounds[1])
 
       if (err != nil) {
-        fmt.Println("int parsing error", err)
+        fmt.Println(chalk.Red, "int parsing error", err)
         min = 0
         max = 0
       }
@@ -45,14 +48,30 @@ func main () {
     }
   }
 
-  fmt.Println("data ready!")
+  fmt.Println(chalk.Magenta, "data ready!")
 
   CountValidPasswords(cleaned)
 }
 
-func CountValidPasswords(data []Password) int {
-  fmt.Println("processing . . .")
-  return 0
+func CountValidPasswords(passwords []Password) int {
+  fmt.Println(chalk.White, "processing . . .")
+
+  countValid := 0
+  for _, pwd := range passwords {
+    charCount := strings.Count(pwd.Password, pwd.Character)
+    fmt.Println(chalk.White, "Password requires between", pwd.Min, "and", pwd.Max, "of the character", pwd.Character, "| found", charCount)
+    if charCount >= pwd.Min && charCount <= pwd.Max {
+      fmt.Println(chalk.Blue, "is good")
+      countValid++
+    }
+  }
+
+  if countValid <= 0 {
+    log.Fatal(chalk.Red, "No valid passwords found")
+  }
+
+  fmt.Println(chalk.Green, countValid, "valid passwords found")
+  return countValid
 }
 
 type Password struct {
