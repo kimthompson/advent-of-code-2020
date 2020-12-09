@@ -21,13 +21,25 @@ func main () {
   json.Unmarshal([]byte(jsonString), &data)
   fmt.Println("to array", data)
 
-  dataCopy := data
+  FindSumToYearWithTwo(data)
+}
 
-  for a := 0; a < len(data); a++ {
-    fmt.Printf("a at %d is %d\n", a, data[a])
+func FindSumToYearWithTwo(d []int ) int {
+  for a := 0; a < len(d); a++ {
+    fmt.Printf("trying %d with:\n", d[a])
 
-    for b := 0; b < len(dataCopy); b++ {
-      fmt.Printf("\tb at %d is %d\n", b, dataCopy[b])
+    for b := 0; b < len(d); b++ {
+      sum := d[a] + d[b]
+      isYear := sum == 2020
+      fmt.Printf("\t%d, which equals %d\n", d[b], sum)
+      if isYear {
+        product := d[a] * d[b]
+        fmt.Printf("\nIt was %d and %d! ", d[a], d[b])
+        fmt.Println("The product of these two is", product)
+        return product
+      }
     }
   }
+
+  return 0
 }
