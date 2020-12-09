@@ -8,7 +8,7 @@ import (
 )
 
 func main () {
-  file, err := ioutil.ReadFile("./data/dayone.json")
+  file, err := ioutil.ReadFile("data.json")
 
   if err != nil {
     fmt.Println("File reading error", err)
