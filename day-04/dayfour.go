@@ -41,10 +41,10 @@ func main () {
 
   passports := ParseDataForPassports(lines)
 
-  PrettyPrintPassports(passports)
-
   validPassports := validation.ValidatePassportsSimple(passports)
   newValidPassports := validation.ValidatePassportsComplex(passports)
+
+  PrettyPrintPassports(newValidPassports)
 
   fmt.Println(chalk.Green, len(validPassports), "out of", len(passports), "are valid at first glance.")
   fmt.Println(chalk.Green, len(newValidPassports), "out of", len(passports), "are truly valid.")

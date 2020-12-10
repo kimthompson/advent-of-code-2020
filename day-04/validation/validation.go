@@ -42,7 +42,7 @@ func ValidatePassportsComplex(passports []Passport) []Passport {
 }
 
 func ValidateBYR(attr string) bool {
-  re := regexp.MustCompile(`\d\d\d\d`)
+  re := regexp.MustCompile(`^\d{4}$`)
   isFourDigits := re.MatchString(attr)
   year := 0
 
@@ -55,7 +55,7 @@ func ValidateBYR(attr string) bool {
 }
 
 func ValidateIYR(attr string) bool {
-  re := regexp.MustCompile(`\d\d\d\d`)
+  re := regexp.MustCompile(`^\d{4}$`)
   isFourDigits := re.MatchString(attr)
   year := 0
 
@@ -68,7 +68,7 @@ func ValidateIYR(attr string) bool {
 }
 
 func ValidateEYR(attr string) bool {
-  re := regexp.MustCompile(`\d\d\d\d`)
+  re := regexp.MustCompile(`^\d{4}$`)
   isFourDigits := re.MatchString(attr)
   year := 0
 
@@ -105,17 +105,17 @@ func ValidateHGT(attr string) bool {
 }
 
 func ValidateHCL(attr string) bool {
-  colorRegex := regexp.MustCompile(`#([a-z]|\d){6}`)
+  colorRegex := regexp.MustCompile(`^#([a-f]|\d){6}$`)
   return colorRegex.MatchString(attr)
 }
 
 func ValidateECL(attr string) bool {
-  colorRegex := regexp.MustCompile(`(amb|blu|brn|gry|grn|hzl|oth)`)
+  colorRegex := regexp.MustCompile(`^(amb|blu|brn|gry|grn|hzl|oth)$`)
   return colorRegex.MatchString(attr)
 }
 
 func ValidatePID(attr string) bool {
-  idRegex := regexp.MustCompile(`\d{9}`)
+  idRegex := regexp.MustCompile(`^\d{9}$`)
   return idRegex.MatchString(attr)
 }
 
