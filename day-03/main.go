@@ -3,7 +3,6 @@ package main
 import (
   "bufio"
   "log"
-  "errors"
   "fmt"
   "os"
 
@@ -30,16 +29,11 @@ func main () {
     log.Fatal(err)
   }
 
-  TraverseForest(3, 1, rows)
+  TraverseForest(3, 1, rows, false)
+  TestSlopes(rows)
 }
 
-func TraverseForest(right int, down int, rows []string) (int, error) {
-  if (right < 1 || down < 1) {
-    return 0, errors.New("need positive, non-zero inputs")
-  }
-
-  fmt.Println(chalk.White, "processing pt. 1 . . .")
-
+func TraverseForest(right int, down int, rows []string, quietMode bool) int {
   currentXPos := right
   currentYPos := down
   treesHit := 0
@@ -47,11 +41,15 @@ func TraverseForest(right int, down int, rows []string) (int, error) {
   for currentYPos < len(rows) {
     row := rows[currentYPos]
     if row != "" {
-      fmt.Printf("Position: (%d, %d) %v\n", currentXPos, currentYPos, row)
+      if (!quietMode) {
+        fmt.Printf("Position: (%d, %d) %v\n", currentXPos, currentYPos, row)
+      }
       
       modPos := currentXPos % (len(row))
       charAtPos := string(row[modPos])
-      fmt.Println(charAtPos, "found at modified position", modPos)
+      if (!quietMode) {
+        fmt.Println(charAtPos, "found at modified position", modPos)
+      }
 
       if charAtPos == "#" {
         treesHit++
@@ -63,5 +61,18 @@ func TraverseForest(right int, down int, rows []string) (int, error) {
   }
 
   fmt.Println(chalk.Green, treesHit, "trees hit!")
-  return treesHit, nil
+  return treesHit
+}
+
+func TestSlopes(rows []string) int {
+  first := TraverseForest(1, 1, rows, true)
+  second := TraverseForest(3, 1, rows, true)
+  third := TraverseForest(5, 1, rows, true)
+  fourth := TraverseForest(7, 1, rows, true)
+  fifth := TraverseForest(1, 2, rows, true)
+
+  ans := first * second * third * fourth * fifth
+
+  fmt.Println(chalk.Blue, ans)
+  return ans
 }
