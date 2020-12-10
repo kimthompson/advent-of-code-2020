@@ -4,7 +4,9 @@ import (
   "bufio"
   "log"
   "fmt"
+  "regexp"
   "strings"
+  "strconv"
   "os"
 
   "github.com/ttacon/chalk"
@@ -42,14 +44,11 @@ func main () {
 
   PrettyPrintPassports(passports)
 
-  var validPassports []Passport 
-  for _, pspt := range passports {
-    if pspt.Valid {
-      validPassports = append(validPassports, pspt)
-    }
-  }
+  validPassports := ValidatePassportsSimple(passports)
+  newValidPassports := ValidatePassportsComplex(passports)
 
-  fmt.Println(chalk.Green, len(validPassports), "out of", len(passports), "are valid.")
+  fmt.Println(chalk.Green, len(validPassports), "out of", len(passports), "are valid at first glance.")
+  fmt.Println(chalk.Green, len(newValidPassports), "out of", len(passports), "are truly valid.")
 }
 
 func ParseDataForPassports(lines []string) []Passport {
@@ -79,13 +78,6 @@ func ParseDataForPassports(lines []string) []Passport {
     pspt.ECL = LookForAttr(bundle, ECL)
     pspt.PID = LookForAttr(bundle, PID)
     pspt.CID = LookForAttr(bundle, CID)
-    pspt.Valid = pspt.BYR != "" &&
-      pspt.IYR != "" &&
-      pspt.EYR != "" &&
-      pspt.HGT != "" &&
-      pspt.HCL != "" &&
-      pspt.ECL != "" &&
-      pspt.PID != ""
 
     pspts = append(pspts, pspt)
   }
@@ -105,15 +97,106 @@ func LookForAttr(psptString string, attr string) string {
   return ""
 }
 
+func ValidatePassportsSimple(passports []Passport) []Passport {
+  var result []Passport
+  for _, pspt := range passports {
+    if (
+      pspt.BYR != "" &&
+      pspt.IYR != "" &&
+      pspt.EYR != "" &&
+      pspt.HGT != "" &&
+      pspt.HCL != "" &&
+      pspt.ECL != "" &&
+      pspt.PID != "") {
+      result = append(result, pspt)
+    }
+  }
+  return result
+}
+
+func ValidatePassportsComplex(passports []Passport) []Passport {
+  var result []Passport
+
+  for _, pspt := range passports {
+    if (
+      ValidateBYR(pspt.BYR) &&
+      ValidateIYR(pspt.IYR) &&
+      ValidateEYR(pspt.EYR) &&
+      ValidateHGT(pspt.HGT) &&
+      pspt.HCL != "" &&
+      pspt.ECL != "" &&
+      pspt.PID != "") {
+      result = append(result, pspt)
+    }
+  }
+  return result
+}
+
+func ValidateBYR(attr string) bool {
+  re := regexp.MustCompile(`\d\d\d\d`)
+  isFourDigits := re.MatchString(attr)
+  year := 0
+
+  if isFourDigits {
+    parsedYear, _ := strconv.Atoi(attr)
+    year = parsedYear
+  }
+
+  return isFourDigits && year >= 1920 && year <= 2002
+}
+
+func ValidateIYR(attr string) bool {
+  re := regexp.MustCompile(`\d\d\d\d`)
+  isFourDigits := re.MatchString(attr)
+  year := 0
+
+  if isFourDigits {
+    parsedYear, _ := strconv.Atoi(attr)
+    year = parsedYear
+  }
+
+  return isFourDigits && year >= 2010 && year <= 2020
+}
+
+func ValidateEYR(attr string) bool {
+  re := regexp.MustCompile(`\d\d\d\d`)
+  isFourDigits := re.MatchString(attr)
+  year := 0
+
+  if isFourDigits {
+    parsedYear, _ := strconv.Atoi(attr)
+    year = parsedYear
+  }
+
+  return isFourDigits && year >= 2020 && year <= 2030
+}
+
+func ValidateHGT(attr string) bool {
+  unitRegex := regexp.MustCompile(`(cm|in)`)
+  unitsFound := unitRegex.FindAllString(attr, -1)
+  unit := ""
+
+  if len(unitsFound) == 1 {
+    unit = unitsFound[0]
+  }
+
+  heightRegex := regexp.MustCompile(`\d*`)
+  heightString := heightRegex.FindString(attr)
+  height, _ := strconv.Atoi(heightString)
+
+  isValidHeight := false
+
+  if unit == "cm" {
+    isValidHeight = height >= 150 && height <= 193
+  } else if unit == "in" {
+    isValidHeight = height >= 59 && height <= 76
+  }
+
+  return isValidHeight
+}
+
 func PrettyPrintPassports(passports []Passport) {
   for i, pspt := range passports {
-    validText := ""
-    if pspt.Valid {
-      validText = "VALID"
-    } else {
-      validText = "INVALID"
-    }
-
     fmt.Println(chalk.Blue, "Passport", i)
     fmt.Println(chalk.Red, "==========")
     fmt.Println(chalk.Magenta, BYR, chalk.White, pspt.BYR)
@@ -124,7 +207,6 @@ func PrettyPrintPassports(passports []Passport) {
     fmt.Println(chalk.Magenta, ECL, chalk.White, pspt.ECL)
     fmt.Println(chalk.Magenta, PID, chalk.White, pspt.PID)
     fmt.Println(chalk.Magenta, CID, chalk.White, pspt.CID)
-    fmt.Println(chalk.Green, validText)
     fmt.Println(chalk.Red, "==========\n")
   }
 }
@@ -138,5 +220,4 @@ type Passport struct {
   ECL string
   PID string
   CID string
-  Valid bool
 }
