@@ -38,7 +38,9 @@ func main () {
     log.Fatal(err)
   }
 
-  passports := ParseData(lines)
+  passports := ParseDataForPassports(lines)
+
+  PrettyPrintPassports(passports)
 
   var validPassports []Passport 
   for _, pspt := range passports {
@@ -50,7 +52,7 @@ func main () {
   fmt.Println(chalk.Green, len(validPassports), "out of", len(passports), "are valid.")
 }
 
-func ParseData(lines []string) []Passport {
+func ParseDataForPassports(lines []string) []Passport {
   var bundles []string
 
   // get each set of attributes onto one line
@@ -85,8 +87,6 @@ func ParseData(lines []string) []Passport {
       pspt.ECL != "" &&
       pspt.PID != ""
 
-    fmt.Println(chalk.Blue, pspt.Valid)
-
     pspts = append(pspts, pspt)
   }
 
@@ -103,6 +103,30 @@ func LookForAttr(psptString string, attr string) string {
   }
 
   return ""
+}
+
+func PrettyPrintPassports(passports []Passport) {
+  for i, pspt := range passports {
+    validText := ""
+    if pspt.Valid {
+      validText = "VALID"
+    } else {
+      validText = "INVALID"
+    }
+
+    fmt.Println(chalk.Blue, "Passport", i)
+    fmt.Println(chalk.Red, "==========")
+    fmt.Println(chalk.Magenta, BYR, chalk.White, pspt.BYR)
+    fmt.Println(chalk.Magenta, IYR, chalk.White, pspt.IYR)
+    fmt.Println(chalk.Magenta, EYR, chalk.White, pspt.EYR)
+    fmt.Println(chalk.Magenta, HGT, chalk.White, pspt.HGT)
+    fmt.Println(chalk.Magenta, HCL, chalk.White, pspt.HCL)
+    fmt.Println(chalk.Magenta, ECL, chalk.White, pspt.ECL)
+    fmt.Println(chalk.Magenta, PID, chalk.White, pspt.PID)
+    fmt.Println(chalk.Magenta, CID, chalk.White, pspt.CID)
+    fmt.Println(chalk.Green, validText)
+    fmt.Println(chalk.Red, "==========\n")
+  }
 }
 
 type Passport struct {
