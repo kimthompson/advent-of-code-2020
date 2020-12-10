@@ -4,6 +4,7 @@ import (
   "bufio"
   "log"
   "fmt"
+  "sort"
   "os"
 
   "github.com/ttacon/chalk"
@@ -32,16 +33,45 @@ func main () {
     log.Fatal(err)
   }
 
-  highestSeatId := 0
+  FindHighestSeatId(lines)
+  FindMySeatId(lines)
+}
+
+func FindMySeatId(lines []string) int {
+  var seatIds []int
 
   for _, line := range lines {
-    fmt.Println(chalk.Magenta, line)
-
     rowNum := FindRow(line[:7])
     colNum := FindCol(line[7:])
     seatId := (rowNum * 8) + colNum
+    seatIds = append(seatIds, seatId)
+  }
 
-    fmt.Println(chalk.Blue, "[", rowNum, ",", colNum, "]", seatId)
+  sort.Ints(seatIds)
+
+  minId := seatIds[0]
+  mySeatId := 0
+
+  // find missing seats
+  for i, id := range seatIds {
+    expectedSeatId := i + minId
+    if id != expectedSeatId {
+      fmt.Println(chalk.Red, "Seat", expectedSeatId, "is missing! It must be mine.")
+      mySeatId = expectedSeatId
+      break
+    }
+  }
+
+  return mySeatId
+}
+
+func FindHighestSeatId(lines []string) int {
+  highestSeatId := 0
+
+  for _, line := range lines {
+    rowNum := FindRow(line[:7])
+    colNum := FindCol(line[7:])
+    seatId := (rowNum * 8) + colNum
 
     if seatId > highestSeatId {
       highestSeatId = seatId
@@ -49,6 +79,7 @@ func main () {
   }
 
   fmt.Println(chalk.Green, "The highest seat ID is", highestSeatId)
+  return highestSeatId
 }
 
 func FindRow(code string) int {
@@ -84,3 +115,5 @@ func FindCol(code string) int {
   }
   return planeCols[0]
 }
+
+// FindMySeat()
