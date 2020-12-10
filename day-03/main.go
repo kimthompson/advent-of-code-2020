@@ -30,8 +30,6 @@ func main () {
     log.Fatal(err)
   }
 
-  fmt.Println(len(rows))
-
   TraverseForest(3, 1, rows)
 }
 
@@ -42,8 +40,8 @@ func TraverseForest(right int, down int, rows []string) (int, error) {
 
   fmt.Println(chalk.White, "processing pt. 1 . . .")
 
-  currentXPos := 1 
-  currentYPos := 1
+  currentXPos := right
+  currentYPos := down
   treesHit := 0
 
   for currentYPos < len(rows) {
