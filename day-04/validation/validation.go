@@ -1,6 +1,7 @@
 package validation
 
 import (
+  //"fmt"
   "regexp"
   "strconv"
 )
@@ -31,9 +32,9 @@ func ValidatePassportsComplex(passports []Passport) []Passport {
       ValidateIYR(pspt.IYR) &&
       ValidateEYR(pspt.EYR) &&
       ValidateHGT(pspt.HGT) &&
-      pspt.HCL != "" &&
-      pspt.ECL != "" &&
-      pspt.PID != "") {
+      ValidateHCL(pspt.HCL) &&
+      ValidateECL(pspt.ECL) &&
+      ValidatePID(pspt.PID)) {
       result = append(result, pspt)
     }
   }
@@ -101,6 +102,21 @@ func ValidateHGT(attr string) bool {
   }
 
   return isValidHeight
+}
+
+func ValidateHCL(attr string) bool {
+  colorRegex := regexp.MustCompile(`#([a-z]|\d){6}`)
+  return colorRegex.MatchString(attr)
+}
+
+func ValidateECL(attr string) bool {
+  colorRegex := regexp.MustCompile(`(amb|blu|brn|gry|grn|hzl|oth)`)
+  return colorRegex.MatchString(attr)
+}
+
+func ValidatePID(attr string) bool {
+  idRegex := regexp.MustCompile(`\d{9}`)
+  return idRegex.MatchString(attr)
 }
 
 type Passport struct {
