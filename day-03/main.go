@@ -1,29 +1,38 @@
 package main
 
 import (
+  "bufio"
+  "log"
   "errors"
   "fmt"
-  "log"
-  "strings"
-  "io/ioutil"
+  "os"
 
   "github.com/ttacon/chalk"
 )
 
 func main () {
-  file, err := ioutil.ReadFile("data.txt")
+  file, err := os.Open("data.txt")
 
   if err != nil {
-    log.Fatal(chalk.Red, "index doesn't exist")
-    return
+    log.Fatal(err)
   }
 
-  fileContents := string(file)
-  rows := strings.Split(fileContents, "\n")
+  defer file.Close()
 
-  fmt.Println(chalk.Magenta, "data ready!")
+  scanner := bufio.NewScanner(file)
 
-  TraverseForest(3, 1, rows[0:26])
+  var rows []string
+  for scanner.Scan() {
+    rows = append(rows, scanner.Text())
+  }
+
+  if err := scanner.Err(); err != nil {
+    log.Fatal(err)
+  }
+
+  fmt.Println(len(rows))
+
+  TraverseForest(3, 1, rows)
 }
 
 func TraverseForest(right int, down int, rows []string) (int, error) {
@@ -33,8 +42,8 @@ func TraverseForest(right int, down int, rows []string) (int, error) {
 
   fmt.Println(chalk.White, "processing pt. 1 . . .")
 
-  currentXPos := right
-  currentYPos := down
+  currentXPos := 1 
+  currentYPos := 1
   treesHit := 0
 
   for currentYPos < len(rows) {
@@ -42,20 +51,16 @@ func TraverseForest(right int, down int, rows []string) (int, error) {
     if row != "" {
       fmt.Printf("Position: (%d, %d) %v\n", currentXPos, currentYPos, row)
       
-      charAtPos := ""
-      if currentXPos > len(row) {
-        modPos := currentXPos % (len(row))
-        charAtPos = string(row[modPos])
-        fmt.Println("modPos", modPos, charAtPos)
-      } else {
-        charAtPos = string(row[currentXPos])
-        fmt.Println("pos", currentXPos, charAtPos)
+      modPos := currentXPos % (len(row))
+      charAtPos := string(row[modPos])
+      fmt.Println(charAtPos, "found at modified position", modPos)
+
+      if charAtPos == "#" {
+        treesHit++
       }
 
       currentXPos += right
       currentYPos += down
-
-      treesHit++
     }
   }
 
