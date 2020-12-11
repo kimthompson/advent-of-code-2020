@@ -4,6 +4,7 @@ import (
   "bufio"
   "log"
   "fmt"
+  "regexp"
   "strings"
   "os"
 
@@ -31,7 +32,15 @@ func main () {
 
   groups := GetGroups(lines)
   
-  fmt.Println(chalk.Blue, GetTotalsPerGroup(groups))
+  groupsWithTotals := GetTotalsPerGroup(groups)
+  total := 0
+
+  for _, group := range groupsWithTotals {
+    fmt.Println(chalk.Magenta, group)
+    total = total + group.total
+  }
+
+  fmt.Println(chalk.Green, "Total:", total)
 }
 
 func GetGroups(lines []string) [][]string {
@@ -49,22 +58,36 @@ func GetGroups(lines []string) [][]string {
   return groups
 }
 
-func GetTotalsPerGroup(groups [][]string) map[string]int {
-  groupTotals := map[string]int{}
+func GetGroupTotal(answers string) int {
+  unique := map[string]bool{}
+
+  for _, char := range answers {
+    re := regexp.MustCompile(`^[a-z]$`)
+    isValidChar := re.MatchString(string(char))
+    if isValidChar {
+      unique[string(char)] = true
+    }
+  }
+
+  return len(unique)
+}
+
+func GetTotalsPerGroup(groups [][]string) []Group {
+  var groupTotals []Group
 
   for _, group := range groups {
     answers := strings.Join(group, " ")
-    
-    unique := map[string]bool{}
 
-    for _, char := range answers {
-      if string(char) != " " {
-        unique[string(char)] = true
-      }
-    }
-
-    groupTotals[answers] = len(unique)
+    var groupTotal Group
+    groupTotal.answerString = answers
+    groupTotal.total = GetGroupTotal(answers)
+    groupTotals = append(groupTotals, groupTotal)
   }
 
   return groupTotals
+}
+
+type Group struct {
+  answerString string
+  total int
 }
