@@ -33,14 +33,20 @@ func main () {
   groups := GetGroups(lines)
   
   groupsWithTotals := GetTotalsPerGroup(groups)
-  total := 0
+  groupsWithExclusiveTotals := GetExclusiveTotalsPerGroup(groups)
 
+  total := 0
   for _, group := range groupsWithTotals {
-    fmt.Println(chalk.Magenta, group)
     total = total + group.total
   }
 
-  fmt.Println(chalk.Green, "Total:", total)
+  exclusiveTotal := 0
+  for _, group := range groupsWithExclusiveTotals {
+    exclusiveTotal = exclusiveTotal + group.total
+  }
+
+  fmt.Println(chalk.Green, "Part 1 Total:", total)
+  fmt.Println(chalk.Green, "Part 2 Total:", exclusiveTotal)
 }
 
 func GetGroups(lines []string) [][]string {
@@ -57,6 +63,37 @@ func GetGroups(lines []string) [][]string {
 
   return groups
 }
+func GetTotalsPerGroup(groups [][]string) []Group {
+  var groupTotals []Group
+
+  for _, group := range groups {
+    answers := strings.Join(group, " ")
+
+    var groupTotal Group
+    groupTotal.answers = group
+    groupTotal.answerString = answers
+    groupTotal.total = GetGroupTotal(answers)
+    groupTotals = append(groupTotals, groupTotal)
+  }
+
+  return groupTotals
+}
+
+func GetExclusiveTotalsPerGroup(groups [][]string) []Group {
+  var groupTotals []Group
+
+  for _, group := range groups {
+    answers := strings.Join(group, " ")
+
+    var groupTotal Group
+    groupTotal.answers = group
+    groupTotal.answerString = answers
+    groupTotal.total = GetExclusiveGroupTotal(group)
+    groupTotals = append(groupTotals, groupTotal)
+  }
+
+  return groupTotals
+}
 
 func GetGroupTotal(answers string) int {
   unique := map[string]bool{}
@@ -72,22 +109,34 @@ func GetGroupTotal(answers string) int {
   return len(unique)
 }
 
-func GetTotalsPerGroup(groups [][]string) []Group {
-  var groupTotals []Group
+func GetExclusiveGroupTotal(answers []string) int {
+  answersString := strings.Join(answers, " ")
+  unique := map[string]string{}
 
-  for _, group := range groups {
-    answers := strings.Join(group, " ")
-
-    var groupTotal Group
-    groupTotal.answerString = answers
-    groupTotal.total = GetGroupTotal(answers)
-    groupTotals = append(groupTotals, groupTotal)
+  for _, char := range answersString {
+    re := regexp.MustCompile(`^[a-z]$`)
+    isValidChar := re.MatchString(string(char))
+    if isValidChar {
+      unique[string(char)] = string(char)
+    }
   }
 
-  return groupTotals
+  groupSize := len(answers)
+  total := 0
+  for _, char := range unique {
+    answerCount := strings.Count(answersString, string(char))
+
+    if answerCount == groupSize {
+      total = total + 1
+    }
+  }
+
+  return total
 }
 
+
 type Group struct {
+  answers []string
   answerString string
   total int
 }
