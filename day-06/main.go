@@ -134,7 +134,6 @@ func GetExclusiveGroupTotal(answers []string) int {
   return total
 }
 
-
 type Group struct {
   answers []string
   answerString string
